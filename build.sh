@@ -33,7 +33,7 @@ sudo make install LDFLAGS="$BEGIN_LDFLAGS"
 cd ..
 
 cd libplist
-./autogen.sh $STATIC_FLAG
+./autogen.sh $STATIC_FLAG --without-cython
 sudo make install LDFLAGS="$BEGIN_LDFLAGS"
 cd ..
 
@@ -43,7 +43,7 @@ sudo make install LDFLAGS="$BEGIN_LDFLAGS"
 cd ..
 
 cd libimobiledevice
-./autogen.sh $STATIC_FLAG
+./autogen.sh $STATIC_FLAG --without-cython
 sudo make install LDFLAGS="$BEGIN_LDFLAGS"
 cd ..
 
@@ -91,13 +91,11 @@ mkdir build
 cd build
 cmake .. -DBUILD_SHARED_LIBS=OFF
 make
-make test
 sudo make install
 cd ../..
 
 cd futurerestore
 ./autogen.sh
-sudo make install LDFLAGS="$BEGIN_LDFLAGS" libgeneral_LIBS="-llzma -lbz2"
-./autogen.sh
-sudo make install LDFLAGS="$BEGIN_LDFLAGS" libgeneral_LIBS="-llzma -lbz2"
+make LDFLAGS="$BEGIN_LDFLAGS" libgeneral_LIBS="-llzma -lbz2"
+sudo make install
 cd ..
