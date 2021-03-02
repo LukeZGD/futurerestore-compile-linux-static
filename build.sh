@@ -7,11 +7,11 @@ export IS_STATIC=0
 # mingw-w64-x86_64-brotli mingw-w64-x86_64-libunistring mingw-w64-x86_64-libpsl libidn2
 
 if [ ! -z $1 ]; then
-	if [ $1 == "static" ]; then
-		export STATIC_FLAG="--enable-static --disable-shared"
-		export BEGIN_LDFLAGS="-all-static -Wl,--allow-multiple-definition"
-		export IS_STATIC=1
-	fi
+    if [ $1 == "static" ]; then
+        export STATIC_FLAG="--enable-static --disable-shared"
+        export BEGIN_LDFLAGS="-all-static -Wl,--allow-multiple-definition"
+        export IS_STATIC=1
+    fi
 fi
 
 mkdir ./futurerestore_compile
@@ -99,34 +99,34 @@ make install LDFLAGS="$BEGIN_LDFLAGS" INSTALL_PREFIX=/mingw64
 cd ..
 
 if [ $IS_STATIC == 1 ]; then
-	git clone --recursive https://github.com/google/brotli
-	cd ./brotli
-	autoreconf -fi
-	./configure $STATIC_FLAG
-	make install LDFLAGS="$BEGIN_LDFLAGS"
-	cd ..
+    git clone --recursive https://github.com/google/brotli
+    cd ./brotli
+    autoreconf -fi
+    ./configure $STATIC_FLAG
+    make install LDFLAGS="$BEGIN_LDFLAGS"
+    cd ..
 
-	wget https://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.gz
-	tar -zxvf ./libunistring-0.9.10.tar.gz
-	cd ./libunistring-0.9.10
-	autoreconf -fi
-	./configure $STATIC_FLAG
-	make install LDFLAGS="$BEGIN_LDFLAGS"
-	cd ..
+    wget https://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.gz
+    tar -zxvf ./libunistring-0.9.10.tar.gz
+    cd ./libunistring-0.9.10
+    autoreconf -fi
+    ./configure $STATIC_FLAG
+    make install LDFLAGS="$BEGIN_LDFLAGS"
+    cd ..
 
-	wget https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz
-	tar -zxvf ./libidn2-2.3.0.tar.gz
-	cd libidn2-2.3.0
-	./configure $STATIC_FLAG
-	make install LDFLAGS="$BEGIN_LDFLAGS"
-	cd ..
+    wget https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz
+    tar -zxvf ./libidn2-2.3.0.tar.gz
+    cd libidn2-2.3.0
+    ./configure $STATIC_FLAG
+    make install LDFLAGS="$BEGIN_LDFLAGS"
+    cd ..
 
-	wget https://github.com/rockdaboot/libpsl/releases/download/0.21.1/libpsl-0.21.1.tar.gz
-	tar -zxvf libpsl-0.21.1.tar.gz
-	cd libpsl-0.21.1
-	./configure $STATIC_FLAG
-	make install LDFLAGS="$BEGIN_LDFLAGS"
-	cd ..
+    wget https://github.com/rockdaboot/libpsl/releases/download/0.21.1/libpsl-0.21.1.tar.gz
+    tar -zxvf libpsl-0.21.1.tar.gz
+    cd libpsl-0.21.1
+    ./configure $STATIC_FLAG
+    make install LDFLAGS="$BEGIN_LDFLAGS"
+    cd ..
 fi
 
 # custom curl build with schannel so ssl / https works out of the box on windows
@@ -135,9 +135,9 @@ autoreconf -fi
 ./configure $STATIC_FLAG --with-schannel --without-ssl
 cd lib
 if [ $IS_STATIC == 1 ]; then
-	make install CFLAGS="-DCURL_STATICLIB -DNGHTTP2_STATICLIB" LDFLAGS="$BEGIN_LDFLAGS"
+    make install CFLAGS="-DCURL_STATICLIB -DNGHTTP2_STATICLIB" LDFLAGS="$BEGIN_LDFLAGS"
 else
-	make install LDFLAGS="$BEGIN_LDFLAGS"
+    make install LDFLAGS="$BEGIN_LDFLAGS"
 fi
 cd ..
 cd ..
@@ -170,7 +170,7 @@ cd ..
 
 cd ./libfragmentzip
 if [ $IS_STATIC == 1 ]; then
-	export curl_LIBS="$(curl-config --static-libs)"
+    export curl_LIBS="$(curl-config --static-libs)"
 fi
 ./autogen.sh $STATIC_FLAG
 make install LDFLAGS="$BEGIN_LDFLAGS"
@@ -202,10 +202,10 @@ cd ./futurerestore
 ./autogen.sh $STATIC_FLAG
 
 if [ $IS_STATIC == 1 ]; then
-	#hacky workaround: replace libgeneral libs to append missing libraries at the end of the g++ command, works because libgeneral is the last lib to be linked
-	make CFLAGS="-DCURL_STATICLIB" LDFLAGS="$BEGIN_LDFLAGS" libgeneral_LIBS="-lbcrypt -lws2_32 -llzma -lbz2 -liconv -lunistring -lnghttp2"
+    #hacky workaround: replace libgeneral libs to append missing libraries at the end of the g++ command, works because libgeneral is the last lib to be linked
+    make CFLAGS="-DCURL_STATICLIB" LDFLAGS="$BEGIN_LDFLAGS" libgeneral_LIBS="-lbcrypt -lws2_32 -llzma -lbz2 -liconv -lunistring -lnghttp2"
 else
-	make LDFLAGS="$BEGIN_LDFLAGS"
+    make LDFLAGS="$BEGIN_LDFLAGS"
 fi
 
 make install
