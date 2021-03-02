@@ -1,5 +1,6 @@
-# futurerestore-compile-windows
-MSYS2 script to compile futurerestore and all of it's dependencies for Windows (dynamically and statically)
+# futurerestore-compile-linux-static
 
-## Usage
-Run `./build.sh` or `./build.sh static` from an MSYS2 MINGW64 shell.
+- Compiles a "static" build of futurerestore for Linux
+- By "static", I only mean libzip, libimobiledevice libs (libplist, libusbmuxd, libimobiledevice), and tihmstar libs (libgeneral, libfragmentzip, img4tool) needed by futurerestore
+- Got a lot of the stuff needed from opa334's Windows compile script, thanks to opa334 for the script
+- Script is tested on Xubuntu 20.04.2

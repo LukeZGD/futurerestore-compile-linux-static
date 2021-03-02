@@ -2,128 +2,102 @@
 
 export STATIC_FLAG="--enable-static --disable-shared"
 export BEGIN_LDFLAGS="-Wl,--allow-multiple-definition"
-export IS_STATIC=1
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig
 
-mkdir ./futurerestore_compile
-cd ./futurerestore_compile
-
-set -e
+mkdir futurerestore_compile
+cd futurerestore_compile
 
 sudo add-apt-repository universe
 sudo apt update
-sudo apt install -y pkg-config libtool automake g++ python-dev libzip-dev libcurl4-openssl-dev cmake libssl-dev libusb-1.0-0-dev libreadline-dev libbz2-dev libpng-dev git
+sudo apt install -y pkg-config libtool automake g++ python-dev libzip-dev libcurl4-openssl-dev cmake libssl-dev libusb-1.0-0-dev libreadline-dev libbz2-dev libpng-dev git autopoint aria2
 
-git clone --recursive https://github.com/lzfse/lzfse
-git clone --recursive https://github.com/curl/curl
-git clone --recursive https://github.com/libimobiledevice/libplist
-git clone --recursive https://github.com/libimobiledevice/libusbmuxd
-git clone --recursive https://github.com/libimobiledevice/libimobiledevice
-git clone --recursive https://github.com/libimobiledevice/libirecovery
-git clone --recursive https://github.com/tihmstar/libgeneral
-git clone --recursive https://github.com/tihmstar/libfragmentzip
-git clone --recursive https://github.com/tihmstar/img4tool
+git clone https://github.com/lzfse/lzfse
+git clone https://github.com/libimobiledevice/libplist
+git clone https://github.com/libimobiledevice/libusbmuxd
+git clone https://github.com/libimobiledevice/libimobiledevice
+git clone https://github.com/libimobiledevice/libirecovery
+git clone https://github.com/tihmstar/libgeneral
+git clone https://github.com/tihmstar/libfragmentzip
+git clone https://github.com/tihmstar/img4tool
+git clone https://github.com/madler/zlib
 git clone --recursive https://github.com/marijuanARM/futurerestore
+aria2c https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
+aria2c https://tukaani.org/xz/xz-5.2.4.tar.gz
+aria2c https://libzip.org/download/libzip-1.5.1.tar.gz
 
 # libgeneral fix
-sed -i'' 's|#   include CUSTOM_LOGGING|//#   include CUSTOM_LOGGING|' ./libgeneral/include/libgeneral/macros.h
+sed -i'' 's|#   include CUSTOM_LOGGING|//#   include CUSTOM_LOGGING|' libgeneral/include/libgeneral/macros.h
 
-cd ./lzfse
+cd lzfse
 sudo make install LDFLAGS="$BEGIN_LDFLAGS"
 cd ..
 
-if [ $IS_STATIC == 1 ]; then
-    git clone --recursive https://github.com/google/brotli
-    cd ./brotli
-    autoreconf -fi
-    ./configure $STATIC_FLAG
-    sudo make install LDFLAGS="$BEGIN_LDFLAGS"
-    cd ..
-
-    wget https://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.gz
-    tar -zxvf ./libunistring-0.9.10.tar.gz
-    cd ./libunistring-0.9.10
-    autoreconf -fi
-    ./configure $STATIC_FLAG
-    sudo make install LDFLAGS="$BEGIN_LDFLAGS"
-    cd ..
-
-    wget https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz
-    tar -zxvf ./libidn2-2.3.0.tar.gz
-    cd libidn2-2.3.0
-    ./configure $STATIC_FLAG
-    sudo make install LDFLAGS="$BEGIN_LDFLAGS"
-    cd ..
-
-    wget https://github.com/rockdaboot/libpsl/releases/download/0.21.1/libpsl-0.21.1.tar.gz
-    tar -zxvf libpsl-0.21.1.tar.gz
-    cd libpsl-0.21.1
-    ./configure $STATIC_FLAG
-    sudo make install LDFLAGS="$BEGIN_LDFLAGS"
-    cd ..
-fi
-
-# custom curl build with schannel so ssl / https works out of the box on windows
-cd ./curl
-autoreconf -fi
-./configure $STATIC_FLAG --with-schannel --without-ssl
-cd lib
-if [ $IS_STATIC == 1 ]; then
-    sudo make install CFLAGS="-DCURL_STATICLIB -DNGHTTP2_STATICLIB" LDFLAGS="$BEGIN_LDFLAGS"
-else
-    sudo make install LDFLAGS="$BEGIN_LDFLAGS"
-fi
-cd ..
-cd ..
-
-cd ./libplist
+cd libplist
 ./autogen.sh $STATIC_FLAG
 sudo make install LDFLAGS="$BEGIN_LDFLAGS"
 cd ..
 
-cd ./libusbmuxd
+cd libusbmuxd
 ./autogen.sh $STATIC_FLAG
 sudo make install LDFLAGS="$BEGIN_LDFLAGS"
 cd ..
 
-cd ./libimobiledevice
+cd libimobiledevice
 ./autogen.sh $STATIC_FLAG
 sudo make install LDFLAGS="$BEGIN_LDFLAGS"
 cd ..
 
-cd ./libirecovery
+cd libirecovery
 ./autogen.sh $STATIC_FLAG
 sudo make install LDFLAGS="$BEGIN_LDFLAGS"
 cd ..
 
-cd ./libgeneral
+cd libgeneral
 ./autogen.sh $STATIC_FLAG
 sudo make install LDFLAGS="$BEGIN_LDFLAGS"
 cd ..
 
-
-cd ./libfragmentzip
-if [ $IS_STATIC == 1 ]; then
-    export curl_LIBS="$(curl-config --static-libs)"
-fi
+cd libfragmentzip
 ./autogen.sh $STATIC_FLAG
 sudo make install LDFLAGS="$BEGIN_LDFLAGS"
 cd ..
 
-cd ./img4tool
+cd img4tool
 ./autogen.sh $STATIC_FLAG
 sudo make install LDFLAGS="$BEGIN_LDFLAGS"
 cd ..
 
-cd ./futurerestore
-./autogen.sh $STATIC_FLAG
+tar -zxvf bzip2-1.0.8.tar.gz
+cd bzip2-1.0.8
+make
+sudo make install LDFLAGS="$BEGIN_LDFLAGS"
+cd ..
 
-if [ $IS_STATIC == 1 ]; then
-    #hacky workaround: replace libgeneral libs to append missing libraries at the end of the g++ command, works because libgeneral is the last lib to be linked
-    make CFLAGS="-DCURL_STATICLIB" LDFLAGS="$BEGIN_LDFLAGS" libgeneral_LIBS="-lbcrypt -llzma -lbz2 -liconv -lunistring -lnghttp2"
-else
-    make LDFLAGS="$BEGIN_LDFLAGS"
-fi
+cd zlib
+./configure --static
+sudo make install LDFLAGS="$BEGIN_LDFLAGS"
+cd ..
 
+tar -zxvf xz-5.2.4.tar.gz
+cd xz-5.2.4
+./autogen.sh
+./configure $STATIC_FLAG
+sudo make install LDFLAGS="$BEGIN_LDFLAGS"
+cd ..
+
+tar -zxvf libzip-1.5.1.tar.gz
+cd libzip-1.5.1
+mkdir build
+cd build
+cmake .. -DBUILD_SHARED_LIBS=OFF
+make
+make test
 sudo make install
+cd ../..
+
+cd futurerestore
+./autogen.sh
+sudo make install LDFLAGS="$BEGIN_LDFLAGS" libgeneral_LIBS="-llzma -lbz2"
+./autogen.sh
+sudo make install LDFLAGS="$BEGIN_LDFLAGS" libgeneral_LIBS="-llzma -lbz2"
 cd ..
