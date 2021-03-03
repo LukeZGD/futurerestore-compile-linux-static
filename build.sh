@@ -4,8 +4,11 @@ export STATIC_FLAG="--enable-static --disable-shared"
 export BEGIN_LDFLAGS="-Wl,--allow-multiple-definition"
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig
 
+rm -rf futurerestore_compile
 mkdir futurerestore_compile
 cd futurerestore_compile
+
+set -e
 
 sudo add-apt-repository universe
 sudo apt update
@@ -43,7 +46,7 @@ cd ..
 cd libusbmuxd
 ./autogen.sh $STATIC_FLAG
 make LDFLAGS="$BEGIN_LDFLAGS"
-sudo make install LDFLAGS="$BEGIN_LDFLAGS"
+sudo make install
 cd ..
 
 cd libimobiledevice
