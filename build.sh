@@ -12,7 +12,7 @@ set -e
 
 sudo add-apt-repository universe
 sudo apt update
-sudo apt install -y pkg-config libtool automake g++ python-dev cmake libssl-dev libusb-1.0-0-dev libreadline-dev libbz2-dev libpng-dev git autopoint aria2
+sudo apt install -y pkg-config libtool automake g++ python-dev cmake libssl-dev libusb-1.0-0-dev libreadline-dev libpng-dev git autopoint aria2
 
 git clone https://github.com/lzfse/lzfse
 git clone https://github.com/libimobiledevice/libplist
@@ -35,6 +35,45 @@ sed -i'' 's|#   include CUSTOM_LOGGING|//#   include CUSTOM_LOGGING|' libgeneral
 cd lzfse
 make LDFLAGS="$BEGIN_LDFLAGS"
 sudo make install
+cd ..
+
+tar -zxvf bzip2-1.0.8.tar.gz
+cd bzip2-1.0.8
+make LDFLAGS="$BEGIN_LDFLAGS"
+sudo make install
+cd ..
+
+cd zlib
+./configure --static
+make LDFLAGS="$BEGIN_LDFLAGS"
+sudo make install
+cd ..
+
+tar -zxvf xz-5.2.4.tar.gz
+cd xz-5.2.4
+./autogen.sh
+./configure $STATIC_FLAG
+make LDFLAGS="$BEGIN_LDFLAGS"
+sudo make install
+cd ..
+
+tar -zxvf libzip-1.5.1.tar.gz
+cd libzip-1.5.1
+mkdir build
+cd build
+cmake .. -DBUILD_SHARED_LIBS=OFF
+make LDFLAGS="$BEGIN_LDFLAGS"
+sudo make install
+cd ../..
+
+cd curl
+autoreconf -fi
+./configure $STATIC_FLAG
+make CFLAGS="-DCURL_STATICLIB" LDFLAGS="$BEGIN_LDFLAGS"
+sudo make install
+sudo ln -sf /usr/local/lib/libcurl.a /usr/lib/x86_64-linux-gnu
+sudo ln -sf /usr/local/lib/libcurl.la /usr/lib/x86_64-linux-gnu
+sudo ln -sf /usr/local/lib/pkgconfig/libcurl.pc /usr/lib/x86_64-linux-gnu/pkgconfig
 cd ..
 
 cd libplist
@@ -77,45 +116,6 @@ cd img4tool
 ./autogen.sh $STATIC_FLAG
 make LDFLAGS="$BEGIN_LDFLAGS"
 sudo make install
-cd ..
-
-tar -zxvf bzip2-1.0.8.tar.gz
-cd bzip2-1.0.8
-make LDFLAGS="$BEGIN_LDFLAGS"
-sudo make install
-cd ..
-
-cd zlib
-./configure --static
-make LDFLAGS="$BEGIN_LDFLAGS"
-sudo make install
-cd ..
-
-tar -zxvf xz-5.2.4.tar.gz
-cd xz-5.2.4
-./autogen.sh
-./configure $STATIC_FLAG
-make LDFLAGS="$BEGIN_LDFLAGS"
-sudo make install
-cd ..
-
-tar -zxvf libzip-1.5.1.tar.gz
-cd libzip-1.5.1
-mkdir build
-cd build
-cmake .. -DBUILD_SHARED_LIBS=OFF
-make LDFLAGS="$BEGIN_LDFLAGS"
-sudo make install
-cd ../..
-
-cd curl
-autoreconf -fi
-./configure $STATIC_FLAG
-make CFLAGS="-DCURL_STATICLIB" LDFLAGS="$BEGIN_LDFLAGS"
-sudo make install
-sudo ln -sf /usr/local/lib/libcurl.a /usr/lib/x86_64-linux-gnu
-sudo ln -sf /usr/local/lib/libcurl.la /usr/lib/x86_64-linux-gnu
-sudo ln -sf /usr/local/lib/pkgconfig/libcurl.pc /usr/lib/x86_64-linux-gnu/pkgconfig
 cd ..
 
 cd futurerestore
