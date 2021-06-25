@@ -20,18 +20,11 @@ git clone https://github.com/libimobiledevice/libusbmuxd
 git clone https://github.com/libimobiledevice/libimobiledevice
 git clone https://github.com/libimobiledevice/libirecovery
 git clone https://github.com/LukeeGD/idevicerestore
-git clone https://github.com/tihmstar/libgeneral
-git clone https://github.com/tihmstar/libfragmentzip
-git clone https://github.com/tihmstar/img4tool
-git clone --recursive https://github.com/LukeeGD/futurerestore
 git clone https://github.com/madler/zlib
 aria2c https://github.com/curl/curl/archive/refs/tags/curl-7_76_1.zip
 aria2c https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
 aria2c https://tukaani.org/xz/xz-5.2.4.tar.gz
 aria2c https://libzip.org/download/libzip-1.5.1.tar.gz
-
-# libgeneral fix
-sed -i'' 's|#   include CUSTOM_LOGGING|//#   include CUSTOM_LOGGING|' libgeneral/include/libgeneral/macros.h
 
 cd lzfse
 make LDFLAGS="$BEGIN_LDFLAGS"
@@ -105,30 +98,5 @@ cd ..
 cd idevicerestore
 ./autogen.sh
 make CFLAGS="-DCURL_STATICLIB" LDFLAGS="$BEGIN_LDFLAGS" LIBS="-llzma -lbz2"
-sudo make install
-cd ..
-
-exit
-cd libgeneral
-./autogen.sh $STATIC_FLAG
-make LDFLAGS="$BEGIN_LDFLAGS"
-sudo make install
-cd ..
-
-cd libfragmentzip
-./autogen.sh $STATIC_FLAG
-make LDFLAGS="$BEGIN_LDFLAGS"
-sudo make install
-cd ..
-
-cd img4tool
-./autogen.sh $STATIC_FLAG
-make LDFLAGS="$BEGIN_LDFLAGS"
-sudo make install
-cd ..
-
-cd futurerestore
-./autogen.sh
-make CFLAGS="-DCURL_STATICLIB" LDFLAGS="$BEGIN_LDFLAGS" libgeneral_LIBS="-llzma -lbz2"
 sudo make install
 cd ..
